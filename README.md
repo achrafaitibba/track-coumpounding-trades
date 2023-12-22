@@ -1,1 +1,3 @@
-First commit
+# Track Compounding Trades
+
+This Java Spring Boot application provides a practical solution for tracking compounding trades. Users can input key parameters such as initial capital, target profit percentage, fixed trade fees, stop-loss orders, and varying trading periods. The app then generates daily balance estimates throughout the selected period, including both fixed and variable balances. Additionally, it displays estimated and real all-time profits, offering a comprehensive overview of your investment journey. Daily, weekly, and monthly targets are presented alongside actual achievements for easy monitoring and analysis.
