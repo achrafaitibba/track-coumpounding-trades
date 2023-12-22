@@ -1,0 +1,31 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/track_trades
+    jdbc-url: jdbc:mysql://localhost:3306/track_trades
+    username: root
+    password: achraf
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQLDialect
+
+logging:
+  level:
+    org:
+      springframwork:
+        security:
+          OFF
+app:
+  security:
+    jwt:
+      secret-key: #*********************************************************
+      expiration: 604800000 # a day 86400000
+      refresh-token:
+        expiration: 604800000 # 7 days
+
