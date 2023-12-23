@@ -1,6 +1,6 @@
 package com.achrafaitibba.trackcompoundingtrades.model;
 
-import com.achrafaitibba.trackcompoundingtrades.enumeration.timeFrame;
+import com.achrafaitibba.trackcompoundingtrades.enumeration.TimeFrame;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -10,10 +10,10 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @Entity
-public class compoundingPeriod {
+public class CompoundingPeriod {
     @Id
     @GeneratedValue
     private Long periodId;
     private Integer number;
-    private timeFrame timeFrame;
+    private TimeFrame timeFrame;
 }

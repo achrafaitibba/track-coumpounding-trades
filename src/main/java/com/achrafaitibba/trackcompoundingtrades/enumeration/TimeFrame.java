@@ -1,6 +1,6 @@
 package com.achrafaitibba.trackcompoundingtrades.enumeration;
 
-public enum timeFrame {
+public enum TimeFrame {
     day,
     week,
     month
