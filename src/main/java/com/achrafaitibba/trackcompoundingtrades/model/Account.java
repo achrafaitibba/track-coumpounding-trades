@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,6 +24,9 @@ public class Account {
     private Double compoundStopLossPercentage;
     private Double currentBalance;
     private Double estimatedCompoundedBalance; // after finishing the trading period
+    private Date officialStartDate;
+    // CompoundingPeriod =
+    // Official start date + (number * timeframe) > use calendar date to calculate, not numbers
     @OneToOne
     private CompoundingPeriod compoundingPeriod;
     @OneToMany
