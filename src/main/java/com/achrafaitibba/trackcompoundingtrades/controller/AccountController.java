@@ -1,8 +1,8 @@
 package com.achrafaitibba.trackcompoundingtrades.controller;
 
-import com.achrafaitibba.trackcompoundingtrades.dto.response.AccountRegister;
-import com.achrafaitibba.trackcompoundingtrades.model.User;
-import com.achrafaitibba.trackcompoundingtrades.service.UserService;
+import com.achrafaitibba.trackcompoundingtrades.dto.request.AccountRegisterRequest;
+import com.achrafaitibba.trackcompoundingtrades.dto.response.AccountRegisterResponse;
+import com.achrafaitibba.trackcompoundingtrades.service.AccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,10 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AccountController {
 
-    private final UserService userService;
+    private final AccountService accountService;
     @PostMapping("/register")
-    public ResponseEntity<AccountRegister> register(@RequestBody User user){
-        return ResponseEntity.ok(userService.accountRegister(user));
+    public ResponseEntity<AccountRegisterResponse> register(@RequestBody AccountRegisterRequest request){
+        return ResponseEntity.ok(accountService.accountRegister(request));
     }
 
 

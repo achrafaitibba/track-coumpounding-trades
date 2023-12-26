@@ -1,7 +1,7 @@
 package com.achrafaitibba.trackcompoundingtrades.enumeration;
 
 public enum CustomErrorMessage {
-    USER_NOT_FOUND("Error message hh...");
+    ACCOUNT_ALREADY_EXIST("The username you provided already used");
 
     private final String msg;
     CustomErrorMessage(String msg){

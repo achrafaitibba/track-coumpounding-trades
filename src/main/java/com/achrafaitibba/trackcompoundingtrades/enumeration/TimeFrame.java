@@ -1,8 +1,12 @@
 package com.achrafaitibba.trackcompoundingtrades.enumeration;
 
 public enum TimeFrame {
-    day,
-    week,
-    month
+    DAY("DAY"),
+    WEEK("WEEK"),
+    MONTH("MONTH"),
+    YEAR("YEAR");
+//todo endpoint; no filter
 
+    TimeFrame(String timeFrame) {
+    }
 }

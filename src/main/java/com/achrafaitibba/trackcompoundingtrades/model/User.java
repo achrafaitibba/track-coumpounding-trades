@@ -1,7 +1,9 @@
 package com.achrafaitibba.trackcompoundingtrades.model;
 
+import com.achrafaitibba.trackcompoundingtrades.configuration.token.Token;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
+import java.util.List;
 
 @Data
 @Builder
@@ -25,6 +28,8 @@ public class User implements UserDetails {
     private String password;
     @OneToOne
     private Account account;
+    @OneToMany(mappedBy = "user")
+    private List<Token> tokens;
 
     @Override
     public String getPassword() {
