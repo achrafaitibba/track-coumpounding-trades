@@ -6,7 +6,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:
@@ -17,14 +17,14 @@ spring:
 logging:
   level:
     org:
-      springframwork:
+      springframework:
         security:
           OFF
 app:
   security:
     jwt:
-      secret-key: #*********************************************************
-      expiration: 604800000 # a day 86400000
+      secret-key: c0182a0c93fdf659eb425445c099af10c66ce08fca923360bf67139abb1fb5a3
+      expiration: 86400000 # 1 day
       refresh-token:
-        expiration: 604800000 # 7 days
+        expiration: 86400000 # 7 days
 

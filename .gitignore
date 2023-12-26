@@ -65,3 +65,6 @@ build/
 /.mvn/wrapper/
 /src/main/resources/assets/css-min/
 /src/main/resources/assets/js-min/
+
+###########################
+/src/main/resources/application-local.yml
