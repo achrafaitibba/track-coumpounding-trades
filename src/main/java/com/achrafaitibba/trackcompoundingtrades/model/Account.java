@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -24,12 +25,13 @@ public class Account {
     private Double baseCapital;
     private Double compoundPercentage;
     private Double estimatedFeesByTradePercentage;
-    private Integer estimatedLossPossibilitiesPercentage; // should be something like 10, 20, 30...
+    private Integer estimatedLossPossibilities;
+    private Integer tradingCycle; // related to the estimated loss possibilities, eg: "est loss po = 10", "trading cycle = 2" = losing 2 trades for every 10
     private Double stopLossPercentage;
     private Double currentBalance;
     private Double estimatedCompoundedBalance; // after finishing the trading period
     @Temporal(TemporalType.DATE)
-    private Date officialStartDate; // format : "yyyy-mm-dd"
+    private LocalDate officialStartDate; // format : "yyyy-mm-dd"
     // CompoundingPeriod =
     // Official start date + (number * timeframe) > use calendar date to calculate, not numbers
     @OneToOne

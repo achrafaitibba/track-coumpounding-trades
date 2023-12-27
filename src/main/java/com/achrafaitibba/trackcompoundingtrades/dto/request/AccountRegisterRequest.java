@@ -2,6 +2,7 @@ package com.achrafaitibba.trackcompoundingtrades.dto.request;
 
 import com.achrafaitibba.trackcompoundingtrades.model.CompoundingPeriod;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 public record AccountRegisterRequest(
@@ -10,9 +11,10 @@ public record AccountRegisterRequest(
         Double baseCapital,
         Double compoundPercentage,
         Double estimatedFeesByTradePercentage,
-        Integer estimatedLossPossibilitiesPercentage,
+        Integer estimatedLossPossibilities,
+        Integer tradingCycle,
         Double stopLossPercentage,
-        Date officialStartDate,
+        LocalDate officialStartDate,
         CompoundingPeriodRequest compoundingPeriod
 ) {
 }
