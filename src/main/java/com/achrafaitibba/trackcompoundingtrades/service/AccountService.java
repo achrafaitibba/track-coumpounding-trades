@@ -23,6 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
@@ -50,7 +51,6 @@ public class AccountService {
             throw new RequestException(CustomErrorMessage.ACCOUNT_ALREADY_EXIST.getMessage(), HttpStatus.CONFLICT);
         }
         List<Target> targets = calculateDailyTargets(request);
-        targetRepository.saveAll(targets);
         CompoundingPeriod compoundingPeriod = compoundingPeriodRepository.save(CompoundingPeriod
                 .builder()
                 .number(request.compoundingPeriod().number())
@@ -65,7 +65,7 @@ public class AccountService {
                         .tradingCycle(request.tradingCycle())
                         .stopLossPercentage(request.stopLossPercentage())
                         .currentBalance(request.baseCapital())
-                        .estimatedCompoundedBalance(targets.get(targets.size()-1).getEstimatedBalanceByTargetAndTimeFrame()) // todo, add the method that calculates it
+                        .estimatedCompoundedBalance(targets.get(targets.size()-1).getEstimatedBalanceByTargetAndTimeFrame())
                         .officialStartDate(request.officialStartDate())
                         .compoundingPeriod(
                                 compoundingPeriod
@@ -198,6 +198,7 @@ public class AccountService {
                 }
             }
         }
+        targetRepository.saveAll(targets);
         return targets;
     }
 
