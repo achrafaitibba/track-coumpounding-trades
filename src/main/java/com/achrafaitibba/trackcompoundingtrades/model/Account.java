@@ -25,7 +25,7 @@ public class Account {
     private Double compoundPercentage;
     private Double estimatedFeesByTradePercentage;
     private Integer estimatedLossPossibilities;
-    private Integer tradingCycle; // related to the estimated loss possibilities, eg: "est loss po = 10", "trading cycle = 2" = losing 2 trades for every 10
+    private Integer tradingCycle; // related to the estimated loss possibilities, eg: "estLossPo = 10", "trading cycle = 2" = losing 2 trades for every 10
     private Double stopLossPercentage;
     private Double currentBalance;
     private Double estimatedCompoundedBalance; // after finishing the trading period
