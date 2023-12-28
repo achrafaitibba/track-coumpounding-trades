@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
@@ -124,7 +125,6 @@ public class TargetService {
                 }
             }
         }
-        //targetRepository.saveAll(targets);
         return targets;
     }
 
@@ -147,7 +147,7 @@ public class TargetService {
      * target end date = last day of the week OR start date + 6
      * timeframe = week
      */
-    public List<Target> calculateWeeklyTargets(AccountRegisterRequest request) {
+    public void calculateWeeklyTargets(AccountRegisterRequest request) {
         List<Target> weeklyTargets = new ArrayList<>();
         List<Target> dailyTargets = calculateDailyTargets(request);
         int days = convertCompoundingPeriodToDays(request.compoundingPeriod().timeFrame(), request.compoundingPeriod().number());
@@ -187,7 +187,6 @@ public class TargetService {
         }
         targetRepository.saveAll(dailyTargets);
         targetRepository.saveAll(weeklyTargets);
-        return weeklyTargets;
     }
 
     public List<Target> calculateMonthlyTargets(AccountRegisterRequest request) {
@@ -195,14 +194,14 @@ public class TargetService {
         calculateWeeklyTargets(request);
         List<Target> monthlyTarget = new ArrayList<>();
         List<LocalDate> dateList = dailyTarget.stream().map(
-                target -> target.getEndDate()
+                Target::getEndDate
         ).toList();
-        Map<Integer, LocalDate> lastRecordOfMonthMap = dateList.stream()
+        Map<YearMonth, LocalDate> lastRecordOfMonthAndYearMap = dateList.stream()
                 .collect(Collectors.groupingBy(
-                        LocalDate::getMonthValue,
+                        date -> YearMonth.from(date),
                         Collectors.collectingAndThen(Collectors.maxBy(LocalDate::compareTo), Optional::get)
                 ));
-        lastRecordOfMonthMap.forEach(
+        lastRecordOfMonthAndYearMap.forEach(
                 (month, lastRecord) -> {
                     for (Target t : dailyTarget) {
                         if (t.getEndDate().equals(lastRecord)) {
@@ -220,10 +219,39 @@ public class TargetService {
         return monthlyTarget;
     }
 
-    //todo
-    public List<Target> calculateYearlyTargets() {
-        return null;
+    public List<Target> calculateYearlyTargets(AccountRegisterRequest request) {
+        calculateMonthlyTargets(request);
+        List<Target> yearlyTargets = new ArrayList<>();
+        List<Target> dailyTarget = calculateDailyTargets(request);
+        List<LocalDate> dateList = dailyTarget.stream().map(
+                Target::getEndDate
+        ).toList();
+
+        Map<Integer, LocalDate> lastRecordOfYearMap = dateList.stream()
+                .collect(Collectors.groupingBy(LocalDate::getYear,
+                        Collectors.collectingAndThen(Collectors.maxBy(LocalDate::compareTo), Optional::get)));
+
+        lastRecordOfYearMap.forEach(
+                (month, lastRecord) -> {
+                    for (Target t : dailyTarget) {
+                        if (t.getEndDate().equals(lastRecord)) {
+                            yearlyTargets.add(Target.builder()
+                                    .timeFrame(TimeFrame.YEAR)
+                                    .startDate((t.getEndDate().with(TemporalAdjusters.firstDayOfMonth())))
+                                    .endDate(lastRecord)
+                                    .estimatedBalanceByTargetAndTimeFrame(t.getEstimatedBalanceByTargetAndTimeFrame())
+                                    .build());
+                        }
+                    }
+                }
+        );
+        targetRepository.saveAll(yearlyTargets);
+
+        return yearlyTargets;
     }
 
 
+    public List<Target> calculateTargets(AccountRegisterRequest request) {
+        return calculateYearlyTargets(request);
+    }
 }
