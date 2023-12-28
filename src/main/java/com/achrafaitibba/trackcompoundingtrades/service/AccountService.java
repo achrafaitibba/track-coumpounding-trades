@@ -16,7 +16,6 @@ import com.achrafaitibba.trackcompoundingtrades.model.User;
 import com.achrafaitibba.trackcompoundingtrades.repository.AccountRepository;
 import com.achrafaitibba.trackcompoundingtrades.repository.CompoundingPeriodRepository;
 import com.achrafaitibba.trackcompoundingtrades.repository.UserRepository;
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -30,7 +29,6 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
-@Builder
 public class AccountService {
     private final UserRepository userRepository;
     private final AccountRepository accountRepository;
@@ -133,7 +131,6 @@ public class AccountService {
                         request.password()
                 )
         );
-
         Map<String, Object> claims  = new HashMap<>();
         claims.put("accountId", user.get().getAccount().getAccountId());
         var jwtToken = jwtService.generateToken(claims, user.get());

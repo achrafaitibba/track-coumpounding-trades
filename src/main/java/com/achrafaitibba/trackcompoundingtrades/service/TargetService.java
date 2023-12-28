@@ -4,7 +4,6 @@ import com.achrafaitibba.trackcompoundingtrades.dto.request.AccountRegisterReque
 import com.achrafaitibba.trackcompoundingtrades.enumeration.TimeFrame;
 import com.achrafaitibba.trackcompoundingtrades.model.Target;
 import com.achrafaitibba.trackcompoundingtrades.repository.TargetRepository;
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +18,6 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Builder
 public class TargetService {
 
     private final TargetRepository targetRepository;

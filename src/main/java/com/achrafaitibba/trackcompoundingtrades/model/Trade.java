@@ -1,29 +1,36 @@
 package com.achrafaitibba.trackcompoundingtrades.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.UUID;
 
 @Data
 @NoArgsConstructor
+@Builder
+@AllArgsConstructor
 @Entity
 @Component
 public class Trade {
 
     @Id
-    private UUID tradeId;
-    private Date date;
+    @GeneratedValue
+    private Long tradeId;
+    private LocalDate date;
     private Double investedCap;
     private Double closedAt;
     private Double PNL; // closedAt - investedCap
     private Double targetByInvestedCap; //always profit calculation
     private Double diffProfitTarget; // difference between target and profit > calc(target - closedAt)
-    @OneToOne
-    private Pair tradingPair;
+    private String tradingPair;
     @ManyToOne
+    @JsonIgnore
     private Account account;
 }
