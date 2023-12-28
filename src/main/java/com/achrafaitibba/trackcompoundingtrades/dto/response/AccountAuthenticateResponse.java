@@ -1,6 +1,6 @@
 package com.achrafaitibba.trackcompoundingtrades.dto.response;
 
-public record AccountRegisterResponse(
+public record AccountAuthenticateResponse(
         String username,
         String accessToken,
         String refreshToken

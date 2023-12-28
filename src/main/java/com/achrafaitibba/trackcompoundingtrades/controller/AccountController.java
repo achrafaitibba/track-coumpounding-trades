@@ -1,7 +1,8 @@
 package com.achrafaitibba.trackcompoundingtrades.controller;
 
+import com.achrafaitibba.trackcompoundingtrades.dto.request.AccountAuthenticateRequest;
 import com.achrafaitibba.trackcompoundingtrades.dto.request.AccountRegisterRequest;
-import com.achrafaitibba.trackcompoundingtrades.dto.response.AccountRegisterResponse;
+import com.achrafaitibba.trackcompoundingtrades.dto.response.AccountAuthenticateResponse;
 import com.achrafaitibba.trackcompoundingtrades.service.AccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,10 +18,15 @@ public class AccountController {
 
     private final AccountService accountService;
     @PostMapping("/register")
-    public ResponseEntity<AccountRegisterResponse> register(@RequestBody AccountRegisterRequest request){
+    public ResponseEntity<AccountAuthenticateResponse> register(@RequestBody AccountRegisterRequest request){
         return ResponseEntity.ok(accountService.accountRegister(request));
     }
 
+    @PostMapping("/authenticate")
+    public ResponseEntity<AccountAuthenticateResponse> authenticate(@RequestBody AccountAuthenticateRequest request){
+
+        return ResponseEntity.ok().body(accountService.authenticate(request));
+    }
 
 
 }

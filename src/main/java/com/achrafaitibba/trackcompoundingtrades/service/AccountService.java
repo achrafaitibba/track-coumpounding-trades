@@ -4,8 +4,9 @@ import com.achrafaitibba.trackcompoundingtrades.configuration.token.JwtService;
 import com.achrafaitibba.trackcompoundingtrades.configuration.token.Token;
 import com.achrafaitibba.trackcompoundingtrades.configuration.token.TokenRepository;
 import com.achrafaitibba.trackcompoundingtrades.configuration.token.TokenType;
+import com.achrafaitibba.trackcompoundingtrades.dto.request.AccountAuthenticateRequest;
 import com.achrafaitibba.trackcompoundingtrades.dto.request.AccountRegisterRequest;
-import com.achrafaitibba.trackcompoundingtrades.dto.response.AccountRegisterResponse;
+import com.achrafaitibba.trackcompoundingtrades.dto.response.AccountAuthenticateResponse;
 import com.achrafaitibba.trackcompoundingtrades.enumeration.CustomErrorMessage;
 import com.achrafaitibba.trackcompoundingtrades.exception.RequestException;
 import com.achrafaitibba.trackcompoundingtrades.model.Account;
@@ -22,6 +23,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
+import java.time.LocalDate;
 import java.util.*;
 
 @Service
@@ -36,9 +38,32 @@ public class AccountService {
     private final CompoundingPeriodRepository compoundingPeriodRepository;
     private final TargetService targetService;
 
-    public AccountRegisterResponse accountRegister(AccountRegisterRequest request) {
+    public AccountAuthenticateResponse accountRegister(AccountRegisterRequest request) {
         if (userRepository.findByUsername(request.username()).isPresent()) {
             throw new RequestException(CustomErrorMessage.ACCOUNT_ALREADY_EXIST.getMessage(), HttpStatus.CONFLICT);
+        }
+        if(request.compoundPercentage()<=0){
+            throw new RequestException(CustomErrorMessage.COMPOUNDING_PERCENTAGE_LOWER_THAN_ZERO.getMessage(), HttpStatus.CONFLICT);
+        }
+        if(request.compoundPercentage()>=100){
+            throw new RequestException(CustomErrorMessage.COMPOUNDING_PERCENTAGE_LESS_THAN_HUNDRED.getMessage(), HttpStatus.CONFLICT);
+        }
+        if(request.estimatedFeesByTradePercentage() >= request.compoundPercentage()){
+            throw new RequestException(CustomErrorMessage.FEES_HIGHER_THAN_COMPOUNDING_RATE.getMessage(), HttpStatus.CONFLICT);
+        }
+        if(request.estimatedFeesByTradePercentage() <=0){
+            throw new RequestException(CustomErrorMessage.POSITIVE_VALUE_FOR_FEES.getMessage(), HttpStatus.CONFLICT);
+        }
+        if(request.estimatedLossPossibilities()<=0 || request.estimatedLossPossibilities() > request.tradingCycle()){
+            throw new RequestException(CustomErrorMessage.ESTIMATED_LOSS_BETWEEN_CYCLE_ZERO.getMessage(), HttpStatus.CONFLICT);
+        }
+        if(request.officialStartDate().isBefore(LocalDate.now())){
+            throw new RequestException(CustomErrorMessage.OFFICIAL_START_DATE_IN_FUTURE.getMessage(), HttpStatus.CONFLICT);
+        }
+
+        if(targetService.convertCompoundingPeriodToDays(request.compoundingPeriod().timeFrame(), request.compoundingPeriod().number()) <30){
+            throw new RequestException(CustomErrorMessage.COMPOUNDING_LESS_THAN_MONTH.getMessage(), HttpStatus.CONFLICT);
+
         }
         List<Target> targets = targetService.calculateTargets(request);
         CompoundingPeriod compoundingPeriod = compoundingPeriodRepository.save(CompoundingPeriod
@@ -74,7 +99,7 @@ public class AccountService {
         var jwtToken = jwtService.generateToken(claims, toSave);
         var refreshToken = jwtService.generateRefreshToken(toSave);
         saveUserToken(toSave, jwtToken);
-        return new AccountRegisterResponse(request.username(), jwtToken, refreshToken);
+        return new AccountAuthenticateResponse(request.username(), jwtToken, refreshToken);
     }
 
 
@@ -88,5 +113,6 @@ public class AccountService {
                 .build();
         tokenRepository.save(token);
     }
+
 
 }
