@@ -220,41 +220,6 @@ public class TargetService {
         return monthlyTarget;
     }
 
-    private static List<LocalDate> generateLocalDates() {
-        List<LocalDate> dateList = new ArrayList<>();
-
-        // Adding LocalDate objects for four different months
-        dateList.add(LocalDate.of(2023, 1, 15));  // January
-        dateList.add(LocalDate.of(2023, 1, 6));  // January
-        dateList.add(LocalDate.of(2023, 1, 1));  // January
-        dateList.add(LocalDate.of(2023, 1, 25));  // January
-        dateList.add(LocalDate.of(2023, 4, 26));  // April
-        dateList.add(LocalDate.of(2023, 4, 11));  // April
-        dateList.add(LocalDate.of(2023, 4, 10));  // April
-        dateList.add(LocalDate.of(2023, 4, 2));  // April
-        dateList.add(LocalDate.of(2023, 7, 25));  // July
-        dateList.add(LocalDate.of(2023, 10, 5));  // October
-        dateList.add(LocalDate.of(2023, 10, 15));  // October
-        dateList.add(LocalDate.of(2023, 10, 3));  // October
-
-
-        return dateList;
-    }
-
-    public static void main(String[] args) {
-        // Assuming you have a List<LocalDate> named dateList
-        List<LocalDate> dateList = generateLocalDates();
-
-        Map<Integer, LocalDate> lastRecordOfMonthMap = dateList.stream()
-                .collect(Collectors.groupingBy(LocalDate::getMonthValue,
-                        Collectors.collectingAndThen(Collectors.maxBy(LocalDate::compareTo), Optional::get)));
-
-        // Printing the result
-        lastRecordOfMonthMap.forEach((month, lastRecord) ->
-                System.out.println("Last record of month " + month + ": " + lastRecord));
-
-    }
-
     //todo
     public List<Target> calculateYearlyTargets() {
         return null;
