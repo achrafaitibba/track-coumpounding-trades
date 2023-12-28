@@ -191,11 +191,7 @@ public class TargetService {
         targetRepository.saveAll(weeklyTargets);
         return weeklyTargets;
     }
-
-    public static void main(String[] args) {
-        System.out.println(34 % 7);
-    }
-
+    
     //todo
     //streams on calculateDailyTargets, filtering or grouping by months
     public List<Target> calculateMonthlyTargets() {
