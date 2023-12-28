@@ -27,7 +27,6 @@ public class Target {
     private LocalDate startDate;
     private LocalDate endDate;
     private Double estimatedBalanceByTargetAndTimeFrame;
-    private Double variableEstimatedBalanceByTargetAndTimeFrame; //todo current balance
 
 
 }

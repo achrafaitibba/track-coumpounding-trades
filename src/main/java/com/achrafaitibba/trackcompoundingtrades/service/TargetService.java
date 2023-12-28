@@ -9,8 +9,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -68,7 +72,6 @@ public class TargetService {
                                     .startDate(targetDate)
                                     .endDate(targetDate)
                                     .estimatedBalanceByTargetAndTimeFrame(currentBalance)
-                                    .variableEstimatedBalanceByTargetAndTimeFrame(baseCapital)
                                     .build()
                     );
                     targetDate = targetDate.plusDays(1);
@@ -81,7 +84,6 @@ public class TargetService {
                                     .startDate(targetDate)
                                     .endDate(targetDate)
                                     .estimatedBalanceByTargetAndTimeFrame(currentBalance)
-                                    .variableEstimatedBalanceByTargetAndTimeFrame(baseCapital)
 
                                     .build()
                     );
@@ -102,7 +104,6 @@ public class TargetService {
                                     .startDate(targetDate)
                                     .endDate(targetDate)
                                     .estimatedBalanceByTargetAndTimeFrame(currentBalance)
-                                    .variableEstimatedBalanceByTargetAndTimeFrame(baseCapital)
                                     .build()
                     );
                     targetDate = targetDate.plusDays(1);
@@ -115,7 +116,6 @@ public class TargetService {
                                     .startDate(targetDate)
                                     .endDate(targetDate)
                                     .estimatedBalanceByTargetAndTimeFrame(currentBalance)
-                                    .variableEstimatedBalanceByTargetAndTimeFrame(baseCapital)
                                     .build()
                     );
                     targetDate = targetDate.plusDays(1);
@@ -124,7 +124,7 @@ public class TargetService {
                 }
             }
         }
-        targetRepository.saveAll(targets);
+        //targetRepository.saveAll(targets);
         return targets;
     }
 
@@ -146,7 +146,6 @@ public class TargetService {
      * target start date = first day of the week
      * target end date = last day of the week OR start date + 6
      * timeframe = week
-     * variable est balance = baseCapital // todo to be updated after every trade
      */
     public List<Target> calculateWeeklyTargets(AccountRegisterRequest request) {
         List<Target> weeklyTargets = new ArrayList<>();
@@ -166,7 +165,6 @@ public class TargetService {
                                     .startDate(startDate)
                                     .endDate(t.getEndDate())
                                     .estimatedBalanceByTargetAndTimeFrame(t.getEstimatedBalanceByTargetAndTimeFrame())
-                                    .variableEstimatedBalanceByTargetAndTimeFrame(t.getVariableEstimatedBalanceByTargetAndTimeFrame())
                                     .build()
                     );
                     startDate = startDate.plusDays(7);
@@ -183,18 +181,78 @@ public class TargetService {
                                 .startDate(endDate)
                                 .endDate(t.getEndDate())
                                 .estimatedBalanceByTargetAndTimeFrame(t.getEstimatedBalanceByTargetAndTimeFrame())
-                                .variableEstimatedBalanceByTargetAndTimeFrame(t.getVariableEstimatedBalanceByTargetAndTimeFrame())
                                 .build()
                 );
             }
         }
+        targetRepository.saveAll(dailyTargets);
         targetRepository.saveAll(weeklyTargets);
         return weeklyTargets;
     }
 
-    //todo
-    public List<Target> calculateMonthlyTargets() {
-        return null;
+    public List<Target> calculateMonthlyTargets(AccountRegisterRequest request) {
+        List<Target> dailyTarget = calculateDailyTargets(request);
+        calculateWeeklyTargets(request);
+        List<Target> monthlyTarget = new ArrayList<>();
+        List<LocalDate> dateList = dailyTarget.stream().map(
+                target -> target.getEndDate()
+        ).toList();
+        Map<Integer, LocalDate> lastRecordOfMonthMap = dateList.stream()
+                .collect(Collectors.groupingBy(
+                        LocalDate::getMonthValue,
+                        Collectors.collectingAndThen(Collectors.maxBy(LocalDate::compareTo), Optional::get)
+                ));
+        lastRecordOfMonthMap.forEach(
+                (month, lastRecord) -> {
+                    for (Target t : dailyTarget) {
+                        if (t.getEndDate().equals(lastRecord)) {
+                            monthlyTarget.add(Target.builder()
+                                    .timeFrame(TimeFrame.MONTH)
+                                    .startDate((t.getEndDate().with(TemporalAdjusters.firstDayOfMonth())))
+                                    .endDate(lastRecord)
+                                    .estimatedBalanceByTargetAndTimeFrame(t.getEstimatedBalanceByTargetAndTimeFrame())
+                                    .build());
+                        }
+                    }
+                }
+        );
+        targetRepository.saveAll(monthlyTarget);
+        return monthlyTarget;
+    }
+
+    private static List<LocalDate> generateLocalDates() {
+        List<LocalDate> dateList = new ArrayList<>();
+
+        // Adding LocalDate objects for four different months
+        dateList.add(LocalDate.of(2023, 1, 15));  // January
+        dateList.add(LocalDate.of(2023, 1, 6));  // January
+        dateList.add(LocalDate.of(2023, 1, 1));  // January
+        dateList.add(LocalDate.of(2023, 1, 25));  // January
+        dateList.add(LocalDate.of(2023, 4, 26));  // April
+        dateList.add(LocalDate.of(2023, 4, 11));  // April
+        dateList.add(LocalDate.of(2023, 4, 10));  // April
+        dateList.add(LocalDate.of(2023, 4, 2));  // April
+        dateList.add(LocalDate.of(2023, 7, 25));  // July
+        dateList.add(LocalDate.of(2023, 10, 5));  // October
+        dateList.add(LocalDate.of(2023, 10, 15));  // October
+        dateList.add(LocalDate.of(2023, 10, 3));  // October
+
+
+        return dateList;
+    }
+
+    public static void main(String[] args) {
+        // Assuming you have a List<LocalDate> named dateList
+        List<LocalDate> dateList = generateLocalDates();
+
+        Map<Integer, LocalDate> lastRecordOfMonthMap = dateList.stream()
+                .collect(Collectors.groupingBy(LocalDate::getMonthValue,
+                        Collectors.collectingAndThen(Collectors.maxBy(LocalDate::compareTo), Optional::get)));
+
+        // Printing the result
+        lastRecordOfMonthMap.forEach((month, lastRecord) ->
+                System.out.println("Last record of month " + month + ": " + lastRecord));
+
     }
 
     //todo
