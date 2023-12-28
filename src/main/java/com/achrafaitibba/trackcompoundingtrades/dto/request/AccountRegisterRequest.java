@@ -1,9 +1,7 @@
 package com.achrafaitibba.trackcompoundingtrades.dto.request;
 
-import com.achrafaitibba.trackcompoundingtrades.model.CompoundingPeriod;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 public record AccountRegisterRequest(
         String username,
