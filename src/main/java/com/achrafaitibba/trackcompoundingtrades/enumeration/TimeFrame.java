@@ -5,8 +5,6 @@ public enum TimeFrame {
     WEEK("WEEK"),
     MONTH("MONTH"),
     YEAR("YEAR");
-//todo endpoint; no filter
-
     TimeFrame(String timeFrame) {
     }
 }

@@ -36,7 +36,8 @@ public class SecurityConfigurationFilter {
                 .requestMatchers(
                         "/api/v1/account/register",
                         "/api/v1/account/authenticate",
-                        "/api/v1/account/refresh-token"
+                        "/api/v1/account/refresh-token",
+                        "/api/v1/enums/timeframes"
                 )
                 .permitAll()
                 //////////////////////
