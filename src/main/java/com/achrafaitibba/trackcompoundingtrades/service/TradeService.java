@@ -2,6 +2,8 @@ package com.achrafaitibba.trackcompoundingtrades.service;
 
 import com.achrafaitibba.trackcompoundingtrades.configuration.token.JwtService;
 import com.achrafaitibba.trackcompoundingtrades.dto.request.TradeRequest;
+import com.achrafaitibba.trackcompoundingtrades.enumeration.CustomErrorMessage;
+import com.achrafaitibba.trackcompoundingtrades.exception.RequestException;
 import com.achrafaitibba.trackcompoundingtrades.model.Account;
 import com.achrafaitibba.trackcompoundingtrades.model.Coin;
 import com.achrafaitibba.trackcompoundingtrades.model.Trade;
@@ -11,7 +13,10 @@ import com.achrafaitibba.trackcompoundingtrades.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 
 @Service
@@ -28,10 +33,22 @@ public class TradeService {
         String header = httpServletRequest.getHeader("Authorization");
         String jwt = header.substring(7);
         Claims claims = jwtService.extractAllClaims(jwt);
-        System.out.println(claims.getSubject());
         Account account = userRepository.findByUsername(
                 claims.getSubject()
         ).get().getAccount();
+
+        if(request.tradeDate().isBefore(account.getOfficialStartDate())){
+            throw new RequestException(CustomErrorMessage.TRADE_DATE_SHOULD_BE_AFTER_START_DATE.getMessage(), HttpStatus.CONFLICT);
+        }
+        if(request.investedCap() <= 0){
+            throw new RequestException(CustomErrorMessage.NEGATIVE_INVESTED_CAP.getMessage(), HttpStatus.CONFLICT);
+        }
+        if(request.investedCap() > account.getCurrentBalance()){
+            throw new RequestException(CustomErrorMessage.INVESTED_CAP_HIGHER_THAN_BASE_CAP.getMessage(), HttpStatus.CONFLICT);
+        }
+        if(request.closedAt()<=0 ){
+            throw new RequestException(CustomErrorMessage.CLOSED_AT_ZERO_VALUE.getMessage(), HttpStatus.CONFLICT);
+        }
         Double targetByInvestedCapital = targetService.calculateTarget(
                 "win",
                 request.investedCap(),
@@ -50,6 +67,7 @@ public class TradeService {
                 .tradingPair(request.baseCoin()+"-"+request.quoteCoin())
                 .account(account)
                 .build();
+        account.setCurrentBalance(account.getCurrentBalance() + trade.getPNL());
         coinRepository.save(Coin.builder().coinName(request.baseCoin()).build());
         coinRepository.save(Coin.builder().coinName(request.quoteCoin()).build());
         tradeRepository.save(trade);
@@ -57,5 +75,16 @@ public class TradeService {
     }
 
 
-
+    public void deleteById(Long id) {
+        Optional<Trade> trade = tradeRepository.findById(id);
+        tradeRepository.deleteById(id);
+        String header = httpServletRequest.getHeader("Authorization");
+        String jwt = header.substring(7);
+        Claims claims = jwtService.extractAllClaims(jwt);
+        Account account = userRepository.findByUsername(
+                claims.getSubject()
+        ).get().getAccount();
+        account.setCurrentBalance(account.getCurrentBalance() - trade.get().getPNL());
+        tradeRepository.deleteById(id);
+    }
 }

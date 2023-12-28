@@ -95,7 +95,6 @@ public class AccountService {
                 .account(account)
                 .build());
 
-        //todo add claims "baseCapital, current balance.."
         Map<String, Object> claims  = new HashMap<>();
         claims.put("accountId", account.getAccountId());
         var jwtToken = jwtService.generateToken(claims, toSave);
