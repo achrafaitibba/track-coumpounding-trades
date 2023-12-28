@@ -140,7 +140,6 @@ public class TargetService {
         currentBalance -= currentBalance * estimatedFeesByTradePercentage;
         return currentBalance;
     }
-    //streams on calculateDailyTargets, filtering or grouping by weeks
 
     /**
      * Weekly target : est of the latest day within the week
@@ -153,7 +152,7 @@ public class TargetService {
         List<Target> weeklyTargets = new ArrayList<>();
         List<Target> dailyTargets = calculateDailyTargets(request);
         int days = convertCompoundingPeriodToDays(request.compoundingPeriod().timeFrame(), request.compoundingPeriod().number());
-        int weeks = days/ 7;
+        int weeks = days / 7;
         LocalDate startDate = request.officialStartDate();
         LocalDate endDate = startDate.plusDays(6);
         int mod = days % 7;
@@ -177,7 +176,7 @@ public class TargetService {
             }
         }
         for (Target t : dailyTargets) {
-            if (t.getStartDate().equals(endDate.minusDays(7-mod)) & mod !=0) {
+            if (t.getStartDate().equals(endDate.minusDays(7 - mod)) & mod != 0) {
                 weeklyTargets.add(
                         Target.builder()
                                 .timeFrame(TimeFrame.WEEK)
@@ -194,14 +193,16 @@ public class TargetService {
     }
 
     public static void main(String[] args) {
-        System.out.println(34%7);
+        System.out.println(34 % 7);
     }
 
+    //todo
     //streams on calculateDailyTargets, filtering or grouping by months
     public List<Target> calculateMonthlyTargets() {
         return null;
     }
 
+    //todo
     //streams on calculateDailyTargets, filtering or grouping by years
     public List<Target> calculateYearlyTargets() {
         return null;
