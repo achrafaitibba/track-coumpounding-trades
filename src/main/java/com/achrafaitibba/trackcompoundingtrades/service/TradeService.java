@@ -37,23 +37,23 @@ public class TradeService {
                 claims.getSubject()
         ).get().getAccount();
 
-        if(request.tradeDate().isBefore(account.getOfficialStartDate())){
+        if (request.tradeDate().isBefore(account.getOfficialStartDate())) {
             throw new RequestException(CustomErrorMessage.TRADE_DATE_SHOULD_BE_AFTER_START_DATE.getMessage(), HttpStatus.CONFLICT);
         }
-        if(request.investedCap() <= 0){
+        if (request.investedCap() <= 0) {
             throw new RequestException(CustomErrorMessage.NEGATIVE_INVESTED_CAP.getMessage(), HttpStatus.CONFLICT);
         }
-        if(request.investedCap() > account.getCurrentBalance()){
+        if (request.investedCap() > account.getCurrentBalance()) {
             throw new RequestException(CustomErrorMessage.INVESTED_CAP_HIGHER_THAN_BASE_CAP.getMessage(), HttpStatus.CONFLICT);
         }
-        if(request.closedAt()<=0 ){
+        if (request.closedAt() <= 0) {
             throw new RequestException(CustomErrorMessage.CLOSED_AT_ZERO_VALUE.getMessage(), HttpStatus.CONFLICT);
         }
         Double targetByInvestedCapital = targetService.calculateTarget(
                 "win",
                 request.investedCap(),
-                account.getCompoundPercentage()/100,
-                account.getEstimatedFeesByTradePercentage()/100
+                account.getCompoundPercentage() / 100,
+                account.getEstimatedFeesByTradePercentage() / 100
         );
         Trade trade = Trade.builder()
                 .date(request.tradeDate())
@@ -63,8 +63,8 @@ public class TradeService {
                 .targetByInvestedCap(
                         targetByInvestedCapital
                 )
-                .diffProfitTarget( request.closedAt() - targetByInvestedCapital )
-                .tradingPair(request.baseCoin()+"-"+request.quoteCoin())
+                .diffProfitTarget(request.closedAt() - targetByInvestedCapital)
+                .tradingPair(request.baseCoin() + "-" + request.quoteCoin())
                 .account(account)
                 .build();
         account.setCurrentBalance(account.getCurrentBalance() + trade.getPNL());
@@ -86,5 +86,33 @@ public class TradeService {
         ).get().getAccount();
         account.setCurrentBalance(account.getCurrentBalance() - trade.get().getPNL());
         tradeRepository.deleteById(id);
+    }
+
+    public Trade updateTrade(Long id, TradeRequest request) {
+        Optional<Trade> trade = tradeRepository.findById(id);
+        String header = httpServletRequest.getHeader("Authorization");
+        String jwt = header.substring(7);
+        Claims claims = jwtService.extractAllClaims(jwt);
+        Account account = userRepository.findByUsername(
+                claims.getSubject()
+        ).get().getAccount();
+        account.setCurrentBalance(account.getCurrentBalance() - trade.get().getPNL());
+        Double targetByInvestedCapital = targetService.calculateTarget(
+                "win",
+                request.investedCap(),
+                account.getCompoundPercentage() / 100,
+                account.getEstimatedFeesByTradePercentage() / 100
+        );
+        double oldPNL = trade.get().getPNL();
+        trade.get().setDate(request.tradeDate());
+        trade.get().setInvestedCap(request.investedCap());
+        trade.get().setClosedAt(request.closedAt());
+        trade.get().setPNL(request.closedAt() - request.investedCap());
+        trade.get().setTargetByInvestedCap(targetByInvestedCapital);
+        trade.get().setDiffProfitTarget(request.closedAt() - targetByInvestedCapital);
+        trade.get().setTradingPair(request.baseCoin()+"-"+request.quoteCoin());
+        Trade  saved = tradeRepository.save(trade.get());
+        account.setCurrentBalance(account.getCurrentBalance() - oldPNL + saved.getPNL());
+        return saved;
     }
 }

@@ -24,12 +24,17 @@ public class TradeController {
          tradeService.deleteById(id);
     }
 
+    @PostMapping("/update/{id}")
+    public ResponseEntity<Trade> updateTrade(@PathVariable Long id,
+                                             @RequestBody TradeRequest request){
+        return ResponseEntity.ok().body(tradeService.updateTrade(id,request));
+    }
 
 
 
     //todo
     /**
-     * Delete trade
+
      * update trade
      * get all trades by user
      */
