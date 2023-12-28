@@ -70,7 +70,7 @@ public class AccountService {
                 .account(account)
                 .build());
 
-        //todo add claims "id, baseCapital.."
+        //todo add claims "baseCapital, current balance.."
         /** Instead of initiating an empty hashmap you can create a list of claims and add them to the hashmap
          Such as birthdate, account status... and any other data needed to be sent to the client whiting the token
          Example:
