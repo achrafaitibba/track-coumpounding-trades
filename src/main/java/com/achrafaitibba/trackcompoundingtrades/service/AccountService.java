@@ -42,7 +42,7 @@ public class AccountService {
         if (userRepository.findByUsername(request.username()).isPresent()) {
             throw new RequestException(CustomErrorMessage.ACCOUNT_ALREADY_EXIST.getMessage(), HttpStatus.CONFLICT);
         }
-        List<Target> targets = targetService.calculateWeeklyTargets(request);//targetService.calculateDailyTargets(request);
+        List<Target> targets = targetService.calculateWeeklyTargets(request);
         CompoundingPeriod compoundingPeriod = compoundingPeriodRepository.save(CompoundingPeriod
                 .builder()
                 .number(request.compoundingPeriod().number())
