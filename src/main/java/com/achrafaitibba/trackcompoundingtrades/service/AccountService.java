@@ -71,13 +71,6 @@ public class AccountService {
                 .build());
 
         //todo add claims "baseCapital, current balance.."
-        /** Instead of initiating an empty hashmap you can create a list of claims and add them to the hashmap
-         Such as birthdate, account status... and any other data needed to be sent to the client whiting the token
-         Example:
-         Map<String, Object> currentDate = new HashMaps<>();
-         currentDate.put("now", LocalDateTime.now()....);
-         Claims could be : email, pictureLink, roles & groups , authentication time...
-         */
         Map<String, Object> claims  = new HashMap<>();
         claims.put("accountId", account.getAccountId());
         var jwtToken = jwtService.generateToken(claims, toSave);
