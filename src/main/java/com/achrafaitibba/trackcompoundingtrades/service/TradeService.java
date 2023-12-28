@@ -89,6 +89,7 @@ public class TradeService {
     }
 
     public Trade updateTrade(Long id, TradeRequest request) {
+
         Optional<Trade> trade = tradeRepository.findById(id);
         String header = httpServletRequest.getHeader("Authorization");
         String jwt = header.substring(7);
@@ -96,6 +97,18 @@ public class TradeService {
         Account account = userRepository.findByUsername(
                 claims.getSubject()
         ).get().getAccount();
+        if (request.tradeDate().isBefore(account.getOfficialStartDate())) {
+            throw new RequestException(CustomErrorMessage.TRADE_DATE_SHOULD_BE_AFTER_START_DATE.getMessage(), HttpStatus.CONFLICT);
+        }
+        if (request.investedCap() <= 0) {
+            throw new RequestException(CustomErrorMessage.NEGATIVE_INVESTED_CAP.getMessage(), HttpStatus.CONFLICT);
+        }
+        if (request.investedCap() > account.getCurrentBalance()) {
+            throw new RequestException(CustomErrorMessage.INVESTED_CAP_HIGHER_THAN_BASE_CAP.getMessage(), HttpStatus.CONFLICT);
+        }
+        if (request.closedAt() <= 0) {
+            throw new RequestException(CustomErrorMessage.CLOSED_AT_ZERO_VALUE.getMessage(), HttpStatus.CONFLICT);
+        }
         account.setCurrentBalance(account.getCurrentBalance() - trade.get().getPNL());
         Double targetByInvestedCapital = targetService.calculateTarget(
                 "win",
