@@ -19,6 +19,8 @@ import com.achrafaitibba.trackcompoundingtrades.repository.UserRepository;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +39,8 @@ public class AccountService {
     private final TokenRepository tokenRepository;
     private final CompoundingPeriodRepository compoundingPeriodRepository;
     private final TargetService targetService;
+    private final AuthenticationManager authenticationManager;
+
 
     public AccountAuthenticateResponse accountRegister(AccountRegisterRequest request) {
         if (userRepository.findByUsername(request.username()).isPresent()) {
@@ -115,4 +119,27 @@ public class AccountService {
     }
 
 
+    public AccountAuthenticateResponse authenticate(AccountAuthenticateRequest request) {
+        Optional<User> user = userRepository.findByUsername(request.username());
+        if(user.isEmpty()){
+            throw new RequestException(CustomErrorMessage.ACCOUNT_NOT_EXISTING.getMessage(), HttpStatus.CONFLICT);
+        }
+        if(!passwordEncoder.matches(request.password(), user.get().getPassword())){
+            throw new RequestException(CustomErrorMessage.PASSWORD_INCORRECT.getMessage(), HttpStatus.CONFLICT);
+        }
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.username(),
+                        request.password()
+                )
+        );
+
+        Map<String, Object> claims  = new HashMap<>();
+        claims.put("accountId", user.get().getAccount().getAccountId());
+        var jwtToken = jwtService.generateToken(claims, user.get());
+        var refreshToken = jwtService.generateRefreshToken(user.get());
+        saveUserToken(user.get(), jwtToken);
+        return new AccountAuthenticateResponse(request.username(), jwtToken, refreshToken);
+
+    }
 }

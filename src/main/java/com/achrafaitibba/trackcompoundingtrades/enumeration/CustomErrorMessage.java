@@ -8,7 +8,9 @@ public enum CustomErrorMessage {
     POSITIVE_VALUE_FOR_FEES("Fees can't have negative value"),
     ESTIMATED_LOSS_BETWEEN_CYCLE_ZERO("Estimated loss possibilities should be between the trading cycle and zero"),
     OFFICIAL_START_DATE_IN_FUTURE("Official start date can't be in past"),
-    COMPOUNDING_LESS_THAN_MONTH("Compounding period should be at least 30 days")
+    COMPOUNDING_LESS_THAN_MONTH("Compounding period should be at least 30 days"),
+    ACCOUNT_NOT_EXISTING("The account you provided doesn't exist"),
+    PASSWORD_INCORRECT("The password you entered is incorrect")
     ;
     private final String msg;
     CustomErrorMessage(String msg){
