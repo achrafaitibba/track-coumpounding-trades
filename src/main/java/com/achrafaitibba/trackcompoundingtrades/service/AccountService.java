@@ -24,8 +24,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
-import java.time.LocalDate;
-import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 
 @Service
@@ -41,9 +39,6 @@ public class AccountService {
     private final TargetService targetService;
 
     public AccountRegisterResponse accountRegister(AccountRegisterRequest request) {
-        /**
-         * check if account already exist
-         * */
         if (userRepository.findByUsername(request.username()).isPresent()) {
             throw new RequestException(CustomErrorMessage.ACCOUNT_ALREADY_EXIST.getMessage(), HttpStatus.CONFLICT);
         }
