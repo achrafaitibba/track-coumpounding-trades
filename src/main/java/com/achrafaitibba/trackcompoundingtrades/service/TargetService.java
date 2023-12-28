@@ -191,15 +191,13 @@ public class TargetService {
         targetRepository.saveAll(weeklyTargets);
         return weeklyTargets;
     }
-    
+
     //todo
-    //streams on calculateDailyTargets, filtering or grouping by months
     public List<Target> calculateMonthlyTargets() {
         return null;
     }
 
     //todo
-    //streams on calculateDailyTargets, filtering or grouping by years
     public List<Target> calculateYearlyTargets() {
         return null;
     }
