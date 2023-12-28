@@ -31,8 +31,6 @@ public class Account {
     private Double estimatedCompoundedBalance; // after finishing the trading period
     @Temporal(TemporalType.DATE)
     private LocalDate officialStartDate; // format : "yyyy-mm-dd"
-    // CompoundingPeriod =
-    // Official start date + (number * timeframe) > use calendar date to calculate, not numbers
     @OneToOne
     private CompoundingPeriod compoundingPeriod;
     @OneToMany
