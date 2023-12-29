@@ -11,4 +11,5 @@ import java.util.UUID;
 public interface TradeRepository extends JpaRepository<Trade, Long> {
 
     Page<Trade> findByAccount_AccountId(UUID accountId, Pageable pageable);
+    int deleteAllByAccount_AccountId(UUID accountId);
 }

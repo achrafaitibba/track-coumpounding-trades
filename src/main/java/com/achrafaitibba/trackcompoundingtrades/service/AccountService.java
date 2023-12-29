@@ -6,16 +6,20 @@ import com.achrafaitibba.trackcompoundingtrades.configuration.token.TokenReposit
 import com.achrafaitibba.trackcompoundingtrades.configuration.token.TokenType;
 import com.achrafaitibba.trackcompoundingtrades.dto.request.AccountAuthenticateRequest;
 import com.achrafaitibba.trackcompoundingtrades.dto.request.AccountRegisterRequest;
+import com.achrafaitibba.trackcompoundingtrades.dto.request.AccountResetRequest;
+import com.achrafaitibba.trackcompoundingtrades.dto.request.CompoundingPeriodRequest;
 import com.achrafaitibba.trackcompoundingtrades.dto.response.AccountAuthenticateResponse;
+import com.achrafaitibba.trackcompoundingtrades.dto.response.AccountPreferencesResponse;
 import com.achrafaitibba.trackcompoundingtrades.enumeration.CustomErrorMessage;
 import com.achrafaitibba.trackcompoundingtrades.exception.RequestException;
 import com.achrafaitibba.trackcompoundingtrades.model.Account;
 import com.achrafaitibba.trackcompoundingtrades.model.CompoundingPeriod;
 import com.achrafaitibba.trackcompoundingtrades.model.Target;
 import com.achrafaitibba.trackcompoundingtrades.model.User;
-import com.achrafaitibba.trackcompoundingtrades.repository.AccountRepository;
-import com.achrafaitibba.trackcompoundingtrades.repository.CompoundingPeriodRepository;
-import com.achrafaitibba.trackcompoundingtrades.repository.UserRepository;
+import com.achrafaitibba.trackcompoundingtrades.repository.*;
+import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -38,12 +42,19 @@ public class AccountService {
     private final CompoundingPeriodRepository compoundingPeriodRepository;
     private final TargetService targetService;
     private final AuthenticationManager authenticationManager;
+    private final HttpServletRequest httpServletRequest;
+    private final TradeRepository tradeRepository;
+    private final TargetRepository targetRepository;
 
 
-    public AccountAuthenticateResponse accountRegister(AccountRegisterRequest request) {
+    public void usernameChecker(AccountRegisterRequest request){
         if (userRepository.findByUsername(request.username()).isPresent()) {
             throw new RequestException(CustomErrorMessage.ACCOUNT_ALREADY_EXIST.getMessage(), HttpStatus.CONFLICT);
         }
+    }
+
+    public AccountAuthenticateResponse accountRegister(AccountRegisterRequest request) {
+
         if(request.compoundPercentage()<=0){
             throw new RequestException(CustomErrorMessage.COMPOUNDING_PERCENTAGE_LOWER_THAN_ZERO.getMessage(), HttpStatus.CONFLICT);
         }
@@ -82,7 +93,6 @@ public class AccountService {
                         .tradingCycle(request.tradingCycle())
                         .stopLossPercentage(request.stopLossPercentage())
                         .currentBalance(request.baseCapital())
-                        //.estimatedCompoundedBalance(targets.get(targets.size()-1).getEstimatedBalanceByTargetAndTimeFrame())
                         .officialStartDate(request.officialStartDate())
                         .compoundingPeriod(
                                 compoundingPeriod
@@ -137,5 +147,50 @@ public class AccountService {
         saveUserToken(user.get(), jwtToken);
         return new AccountAuthenticateResponse(request.username(), jwtToken, refreshToken);
 
+    }
+    @Transactional
+    public AccountAuthenticateResponse resetAllData(AccountResetRequest request) {
+        String header = httpServletRequest.getHeader("Authorization");
+        String jwt = header.substring(7);
+        Claims claims = jwtService.extractAllClaims(jwt);
+        Account account = userRepository.findByUsername(
+                claims.getSubject()
+        ).get().getAccount();
+        targetRepository.deleteAllByAccount_AccountId(account.getAccountId());
+        tradeRepository.deleteAllByAccount_AccountId(account.getAccountId());
+        accountRepository.delete(account);
+
+        return accountRegister(new AccountRegisterRequest(
+                claims.getSubject(),
+                userRepository.findByUsername(claims.getSubject()).get().getPassword(),
+                request.baseCapital(),
+                request.compoundPercentage(),
+                request.estimatedFeesByTradePercentage(),
+                request.estimatedLossPossibilities(),
+                request.tradingCycle(),
+                request.stopLossPercentage(),
+                request.officialStartDate(),
+                request.compoundingPeriod()
+        ));
+    }
+
+    public AccountPreferencesResponse getAccountPreferences() {
+        String header = httpServletRequest.getHeader("Authorization");
+        String jwt = header.substring(7);
+        Claims claims = jwtService.extractAllClaims(jwt);
+        Account account = userRepository.findByUsername(
+                claims.getSubject()
+        ).get().getAccount();
+        return new AccountPreferencesResponse(
+                account.getBaseCapital(),
+                account.getCompoundPercentage(),
+                account.getEstimatedFeesByTradePercentage(),
+                account.getEstimatedLossPossibilities(),
+                account.getTradingCycle(),
+                account.getStopLossPercentage(),
+                account.getOfficialStartDate(),
+                account.getCompoundingPeriod()
+
+        );
     }
 }
