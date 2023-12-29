@@ -11,12 +11,5 @@ public class TrackCompoundingTradesApplication {
         SpringApplication.run(TrackCompoundingTradesApplication.class, args);
     }
 
-    /**
-     * // todo database backup if I stop running the server on railway >
-     * use my server ? or create a copy in my computer
-     * // import/export "excel? or DB? or ...
-     */
-    // todo data backup should be used to insert it again in case of data loss
-
 
 }
