@@ -22,6 +22,11 @@ achievements for easy monitoring and analysis.
 - Estimated loss percentage `aka stop loss`
 - Official start date `To calculate the period with fixed dates`
 
+
+## Read this please hh
+If you are reading this, I want you to know that the code I made is shi*
+I can make it better, but I felt tired and just wanted to finish it hh, maybe someday I will make it clean as much as I can, so please don't judge my ugly code.
+
 ## About the Application
 
 This is a simple web application that exposes a REST API. This application uses Maven as the build tool and the current
