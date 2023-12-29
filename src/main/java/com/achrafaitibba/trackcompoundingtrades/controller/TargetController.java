@@ -18,11 +18,14 @@ public class TargetController {
     private final TargetService targetService;
 
     @GetMapping("/{timeframe}/{page}/{size}")
-    public ResponseEntity<Page<Target>> getAllTarget(
+    public ResponseEntity<Page<Target>> getAllTargets(
             @PathVariable String timeframe,
             @PathVariable Integer page,
             @PathVariable Integer size
     ) {
         return ResponseEntity.ok().body(targetService.getAll(timeframe, page - 1, size));
     }
+
+
+
 }

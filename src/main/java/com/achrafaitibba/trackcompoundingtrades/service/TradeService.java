@@ -3,6 +3,7 @@ package com.achrafaitibba.trackcompoundingtrades.service;
 import com.achrafaitibba.trackcompoundingtrades.configuration.token.JwtService;
 import com.achrafaitibba.trackcompoundingtrades.dto.request.TradeRequest;
 import com.achrafaitibba.trackcompoundingtrades.enumeration.CustomErrorMessage;
+import com.achrafaitibba.trackcompoundingtrades.enumeration.TimeFrame;
 import com.achrafaitibba.trackcompoundingtrades.exception.RequestException;
 import com.achrafaitibba.trackcompoundingtrades.model.Account;
 import com.achrafaitibba.trackcompoundingtrades.model.Coin;
@@ -13,6 +14,11 @@ import com.achrafaitibba.trackcompoundingtrades.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -127,5 +133,18 @@ public class TradeService {
         Trade  saved = tradeRepository.save(trade.get());
         account.setCurrentBalance(account.getCurrentBalance() - oldPNL + saved.getPNL());
         return saved;
+    }
+
+    public Page<Trade> getAll(String sort, String direction, Integer page, Integer size) {
+        String header = httpServletRequest.getHeader("Authorization");
+        String jwt = header.substring(7);
+        Claims claims = jwtService.extractAllClaims(jwt);
+        Account account = userRepository.findByUsername(
+                claims.getSubject()
+        ).get().getAccount();
+        Sort sorting = Sort.by(Sort.Direction.valueOf(direction),sort);
+        Pageable pageable = PageRequest.of(page, size, sorting);
+        return tradeRepository.findByAccount_AccountId(account.getAccountId(), pageable);
+
     }
 }

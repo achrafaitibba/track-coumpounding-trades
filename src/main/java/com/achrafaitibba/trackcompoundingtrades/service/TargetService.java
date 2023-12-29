@@ -64,7 +64,7 @@ public class TargetService {
         double estimatedFeesByTradePercentage = request.estimatedFeesByTradePercentage() / 100;
         int estimatedLossPossibilities = request.estimatedLossPossibilities();
         double stopLossPercentage = request.stopLossPercentage() / 100;
-        double currentBalance = baseCapital; // todo; (baseCapital + sum(profit by trades)
+        double currentBalance = baseCapital;
         final int cycleLimit = request.tradingCycle();
         LocalDate targetDate = request.officialStartDate();
         int cycleLimitCount = cycleLimit; //days
@@ -283,7 +283,7 @@ public class TargetService {
         Account account = userRepository.findByUsername(
                 claims.getSubject()
         ).get().getAccount();
-        Sort sorting = Sort.by("startDate");
+        Sort sorting = Sort.by(Sort.Direction.ASC,"startDate");
         Pageable pageable = PageRequest.of(page, size, sorting);
         return targetRepository.findByTimeFrameAndAccount_AccountId(TimeFrame.valueOf(timeframe), account.getAccountId(), pageable);
     }

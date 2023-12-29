@@ -17,8 +17,6 @@ public class TrackCompoundingTradesApplication {
      * // import/export "excel? or DB? or ...
      */
     // todo data backup should be used to insert it again in case of data loss
-    // todo pagination and sorting
-    // todo reset all data >endpoint
 
 
 }
