@@ -2,8 +2,7 @@ package com.achrafaitibba.trackcompoundingtrades.service;
 
 import com.achrafaitibba.trackcompoundingtrades.configuration.token.JwtService;
 import com.achrafaitibba.trackcompoundingtrades.dto.request.TradeRequest;
-import com.achrafaitibba.trackcompoundingtrades.enumeration.CustomErrorMessage;
-import com.achrafaitibba.trackcompoundingtrades.enumeration.TimeFrame;
+import com.achrafaitibba.trackcompoundingtrades.exception.CustomErrorMessage;
 import com.achrafaitibba.trackcompoundingtrades.exception.RequestException;
 import com.achrafaitibba.trackcompoundingtrades.model.Account;
 import com.achrafaitibba.trackcompoundingtrades.model.Coin;

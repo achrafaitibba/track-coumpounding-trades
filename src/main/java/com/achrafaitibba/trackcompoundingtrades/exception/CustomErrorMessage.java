@@ -1,4 +1,4 @@
-package com.achrafaitibba.trackcompoundingtrades.enumeration;
+package com.achrafaitibba.trackcompoundingtrades.exception;
 
 public enum CustomErrorMessage {
     ACCOUNT_ALREADY_EXIST("The username you provided already used"),
