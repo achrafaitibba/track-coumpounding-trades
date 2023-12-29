@@ -28,6 +28,10 @@ public class AccountController {
         return ResponseEntity.ok().body(accountService.authenticate(request));
     }
 
+
+
+
+
     // todo reset all data >endpoint
     /**
      * Trades

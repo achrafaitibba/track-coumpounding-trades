@@ -70,7 +70,7 @@ public class TradeService {
                         targetByInvestedCapital
                 )
                 .diffProfitTarget(request.closedAt() - targetByInvestedCapital)
-                .tradingPair(request.baseCoin() + "-" + request.quoteCoin())
+                .tradingPair(request.baseCoin().toUpperCase() + "-" + request.quoteCoin().toUpperCase())
                 .account(account)
                 .build();
         account.setCurrentBalance(account.getCurrentBalance() + trade.getPNL());
@@ -129,7 +129,7 @@ public class TradeService {
         trade.get().setPNL(request.closedAt() - request.investedCap());
         trade.get().setTargetByInvestedCap(targetByInvestedCapital);
         trade.get().setDiffProfitTarget(request.closedAt() - targetByInvestedCapital);
-        trade.get().setTradingPair(request.baseCoin()+"-"+request.quoteCoin());
+        trade.get().setTradingPair(request.baseCoin().toUpperCase()+"-"+request.quoteCoin().toUpperCase());
         Trade  saved = tradeRepository.save(trade.get());
         account.setCurrentBalance(account.getCurrentBalance() - oldPNL + saved.getPNL());
         return saved;
