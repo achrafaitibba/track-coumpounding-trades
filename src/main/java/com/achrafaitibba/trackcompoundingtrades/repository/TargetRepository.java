@@ -12,4 +12,6 @@ import java.util.UUID;
 public interface TargetRepository extends JpaRepository<Target, Long> {
     Page<Target> findByTimeFrameAndAccount_AccountId(TimeFrame timeFrame, UUID account_accountId, Pageable pageable);
     int deleteAllByAccount_AccountId(UUID accountId);
+
+    List<Target> findAllByAccount_AccountId(UUID accountId);
 }

@@ -74,30 +74,16 @@ public class TargetService {
             if (cycleLimitCount <= cycleLimit & cycleLimitCount > 0) {
                 if (profitableTradesCount < (cycleLimit - estimatedLossPossibilities)) {
                     currentBalance = calculateTarget("win", currentBalance, compoundPercentage, estimatedFeesByTradePercentage);
-                    targets.add(
-                            Target.builder()
-                                    .timeFrame(TimeFrame.DAY)
-                                    .startDate(targetDate)
-                                    .endDate(targetDate)
-                                    .estimatedBalanceByTargetAndTimeFrame(currentBalance)
-                                    .account(Account.builder().accountId(accountId).build())
+                    targets.add(Target.builder().timeFrame(TimeFrame.DAY).startDate(targetDate).endDate(targetDate).estimatedBalanceByTargetAndTimeFrame(currentBalance).account(Account.builder().accountId(accountId).build())
 
-                                    .build()
-                    );
+                            .build());
                     targetDate = targetDate.plusDays(1);
                     profitableTradesCount++;
                 } else if (profitableTradesCount == (cycleLimit - estimatedLossPossibilities) & losingTradesCount < (cycleLimit - profitableTradesCount)) {
                     currentBalance = calculateTarget("loss", currentBalance, stopLossPercentage, estimatedFeesByTradePercentage);
-                    targets.add(
-                            Target.builder()
-                                    .timeFrame(TimeFrame.DAY)
-                                    .startDate(targetDate)
-                                    .endDate(targetDate)
-                                    .estimatedBalanceByTargetAndTimeFrame(currentBalance)
-                                    .account(Account.builder().accountId(accountId).build())
+                    targets.add(Target.builder().timeFrame(TimeFrame.DAY).startDate(targetDate).endDate(targetDate).estimatedBalanceByTargetAndTimeFrame(currentBalance).account(Account.builder().accountId(accountId).build())
 
-                                    .build()
-                    );
+                            .build());
                     targetDate = targetDate.plusDays(1);
                     losingTradesCount++;
 
@@ -109,30 +95,16 @@ public class TargetService {
                 losingTradesCount = 0;
                 if (profitableTradesCount < (cycleLimit - estimatedLossPossibilities)) {
                     currentBalance = calculateTarget("win", currentBalance, compoundPercentage, estimatedFeesByTradePercentage);
-                    targets.add(
-                            Target.builder()
-                                    .timeFrame(TimeFrame.DAY)
-                                    .startDate(targetDate)
-                                    .endDate(targetDate)
-                                    .estimatedBalanceByTargetAndTimeFrame(currentBalance)
-                                    .account(Account.builder().accountId(accountId).build())
+                    targets.add(Target.builder().timeFrame(TimeFrame.DAY).startDate(targetDate).endDate(targetDate).estimatedBalanceByTargetAndTimeFrame(currentBalance).account(Account.builder().accountId(accountId).build())
 
-                                    .build()
-                    );
+                            .build());
                     targetDate = targetDate.plusDays(1);
                     profitableTradesCount++;
                 } else if (profitableTradesCount == (cycleLimit - estimatedLossPossibilities) & losingTradesCount < (cycleLimit - profitableTradesCount)) {
                     currentBalance = calculateTarget("loss", currentBalance, stopLossPercentage, estimatedFeesByTradePercentage);
-                    targets.add(
-                            Target.builder()
-                                    .timeFrame(TimeFrame.DAY)
-                                    .startDate(targetDate)
-                                    .endDate(targetDate)
-                                    .estimatedBalanceByTargetAndTimeFrame(currentBalance)
-                                    .account(Account.builder().accountId(accountId).build())
+                    targets.add(Target.builder().timeFrame(TimeFrame.DAY).startDate(targetDate).endDate(targetDate).estimatedBalanceByTargetAndTimeFrame(currentBalance).account(Account.builder().accountId(accountId).build())
 
-                                    .build()
-                    );
+                            .build());
                     targetDate = targetDate.plusDays(1);
                     losingTradesCount++;
 
@@ -142,7 +114,7 @@ public class TargetService {
         return targets;
     }
 
-    public double calculateTarget(String type, double currentBalance, double changePercentage, double estimatedFeesByTradePercentage) {
+    public double calculateTarget(String type, Double currentBalance, Double changePercentage, Double estimatedFeesByTradePercentage) {
         switch (type) {
             case "loss":
                 currentBalance = currentBalance * (1 - changePercentage);
@@ -173,16 +145,9 @@ public class TargetService {
         while (count <= weeks) {
             for (Target t : dailyTargets) {
                 if (t.getStartDate().equals(endDate)) {
-                    weeklyTargets.add(
-                            Target.builder()
-                                    .timeFrame(TimeFrame.WEEK)
-                                    .startDate(startDate)
-                                    .endDate(t.getEndDate())
-                                    .estimatedBalanceByTargetAndTimeFrame(t.getEstimatedBalanceByTargetAndTimeFrame())
-                                    .account(Account.builder().accountId(accountId).build())
+                    weeklyTargets.add(Target.builder().timeFrame(TimeFrame.WEEK).startDate(startDate).endDate(t.getEndDate()).estimatedBalanceByTargetAndTimeFrame(t.getEstimatedBalanceByTargetAndTimeFrame()).account(Account.builder().accountId(accountId).build())
 
-                                    .build()
-                    );
+                            .build());
                     startDate = startDate.plusDays(7);
                     endDate = endDate.plusDays(7);
                     count++;
@@ -191,16 +156,9 @@ public class TargetService {
         }
         for (Target t : dailyTargets) {
             if (t.getStartDate().equals(endDate.minusDays(7 - mod)) & mod != 0) {
-                weeklyTargets.add(
-                        Target.builder()
-                                .timeFrame(TimeFrame.WEEK)
-                                .startDate(endDate)
-                                .endDate(t.getEndDate())
-                                .estimatedBalanceByTargetAndTimeFrame(t.getEstimatedBalanceByTargetAndTimeFrame())
-                                .account(Account.builder().accountId(accountId).build())
+                weeklyTargets.add(Target.builder().timeFrame(TimeFrame.WEEK).startDate(endDate).endDate(t.getEndDate()).estimatedBalanceByTargetAndTimeFrame(t.getEstimatedBalanceByTargetAndTimeFrame()).account(Account.builder().accountId(accountId).build())
 
-                                .build()
-                );
+                        .build());
             }
         }
         targetRepository.saveAll(dailyTargets);
@@ -211,30 +169,17 @@ public class TargetService {
         List<Target> dailyTarget = calculateDailyTargets(accountId, request);
         calculateWeeklyTargets(accountId, request);
         List<Target> monthlyTarget = new ArrayList<>();
-        List<LocalDate> dateList = dailyTarget.stream().map(
-                Target::getEndDate
-        ).toList();
-        Map<YearMonth, LocalDate> lastRecordOfMonthAndYearMap = dateList.stream()
-                .collect(Collectors.groupingBy(
-                        date -> YearMonth.from(date),
-                        Collectors.collectingAndThen(Collectors.maxBy(LocalDate::compareTo), Optional::get)
-                ));
-        lastRecordOfMonthAndYearMap.forEach(
-                (month, lastRecord) -> {
-                    for (Target t : dailyTarget) {
-                        if (t.getEndDate().equals(lastRecord)) {
-                            monthlyTarget.add(Target.builder()
-                                    .timeFrame(TimeFrame.MONTH)
-                                    .startDate((t.getEndDate().with(TemporalAdjusters.firstDayOfMonth())))
-                                    .endDate(lastRecord)
-                                    .estimatedBalanceByTargetAndTimeFrame(t.getEstimatedBalanceByTargetAndTimeFrame())
-                                    .account(Account.builder().accountId(accountId).build())
+        List<LocalDate> dateList = dailyTarget.stream().map(Target::getEndDate).toList();
+        Map<YearMonth, LocalDate> lastRecordOfMonthAndYearMap = dateList.stream().collect(Collectors.groupingBy(date -> YearMonth.from(date), Collectors.collectingAndThen(Collectors.maxBy(LocalDate::compareTo), Optional::get)));
+        lastRecordOfMonthAndYearMap.forEach((month, lastRecord) -> {
+            for (Target t : dailyTarget) {
+                if (t.getEndDate().equals(lastRecord)) {
+                    monthlyTarget.add(Target.builder().timeFrame(TimeFrame.MONTH).startDate((t.getEndDate().with(TemporalAdjusters.firstDayOfMonth()))).endDate(lastRecord).estimatedBalanceByTargetAndTimeFrame(t.getEstimatedBalanceByTargetAndTimeFrame()).account(Account.builder().accountId(accountId).build())
 
-                                    .build());
-                        }
-                    }
+                            .build());
                 }
-        );
+            }
+        });
         targetRepository.saveAll(monthlyTarget);
         return monthlyTarget;
     }
@@ -243,29 +188,17 @@ public class TargetService {
         calculateMonthlyTargets(accountId, request);
         List<Target> yearlyTargets = new ArrayList<>();
         List<Target> dailyTarget = calculateDailyTargets(accountId, request);
-        List<LocalDate> dateList = dailyTarget.stream().map(
-                Target::getEndDate
-        ).toList();
+        List<LocalDate> dateList = dailyTarget.stream().map(Target::getEndDate).toList();
 
-        Map<Integer, LocalDate> lastRecordOfYearMap = dateList.stream()
-                .collect(Collectors.groupingBy(LocalDate::getYear,
-                        Collectors.collectingAndThen(Collectors.maxBy(LocalDate::compareTo), Optional::get)));
+        Map<Integer, LocalDate> lastRecordOfYearMap = dateList.stream().collect(Collectors.groupingBy(LocalDate::getYear, Collectors.collectingAndThen(Collectors.maxBy(LocalDate::compareTo), Optional::get)));
 
-        lastRecordOfYearMap.forEach(
-                (month, lastRecord) -> {
-                    for (Target t : dailyTarget) {
-                        if (t.getEndDate().equals(lastRecord)) {
-                            yearlyTargets.add(Target.builder()
-                                    .timeFrame(TimeFrame.YEAR)
-                                    .startDate((t.getEndDate().with(TemporalAdjusters.firstDayOfMonth())))
-                                    .endDate(lastRecord)
-                                    .estimatedBalanceByTargetAndTimeFrame(t.getEstimatedBalanceByTargetAndTimeFrame())
-                                    .account(Account.builder().accountId(accountId).build())
-                                    .build());
-                        }
-                    }
+        lastRecordOfYearMap.forEach((month, lastRecord) -> {
+            for (Target t : dailyTarget) {
+                if (t.getEndDate().equals(lastRecord)) {
+                    yearlyTargets.add(Target.builder().timeFrame(TimeFrame.YEAR).startDate((t.getEndDate().with(TemporalAdjusters.firstDayOfMonth()))).endDate(lastRecord).estimatedBalanceByTargetAndTimeFrame(t.getEstimatedBalanceByTargetAndTimeFrame()).account(Account.builder().accountId(accountId).build()).build());
                 }
-        );
+            }
+        });
         targetRepository.saveAll(yearlyTargets);
 
         return yearlyTargets;
@@ -280,11 +213,19 @@ public class TargetService {
         String header = httpServletRequest.getHeader("Authorization");
         String jwt = header.substring(7);
         Claims claims = jwtService.extractAllClaims(jwt);
-        Account account = userRepository.findByUsername(
-                claims.getSubject()
-        ).get().getAccount();
-        Sort sorting = Sort.by(Sort.Direction.ASC,"startDate");
+        Account account = userRepository.findByUsername(claims.getSubject()).get().getAccount();
+        Sort sorting = Sort.by(Sort.Direction.ASC, "startDate");
         Pageable pageable = PageRequest.of(page, size, sorting);
         return targetRepository.findByTimeFrameAndAccount_AccountId(TimeFrame.valueOf(timeframe), account.getAccountId(), pageable);
     }
+
+    public Double refreshActualTarget() {
+        String header = httpServletRequest.getHeader("Authorization");
+        String jwt = header.substring(7);
+        Claims claims = jwtService.extractAllClaims(jwt);
+        Account account = userRepository.findByUsername(claims.getSubject()).get().getAccount();
+        Double today = calculateTarget("win", account.getCurrentBalance(), account.getCompoundPercentage() / 100, account.getEstimatedFeesByTradePercentage() / 100);
+        return today;
+    }
 }
+

@@ -27,5 +27,9 @@ public class TargetController {
     }
 
 
+    @GetMapping("actual")
+    public ResponseEntity<Double> refreshActualTarget(){
+        return ResponseEntity.ok().body(targetService.refreshActualTarget());
+    }
 
 }
