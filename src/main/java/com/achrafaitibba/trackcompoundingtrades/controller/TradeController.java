@@ -32,10 +32,10 @@ public class TradeController {
 
 
 
+
+
     //todo
     /**
-
-     * update trade
      * get all trades by user
      */
 }

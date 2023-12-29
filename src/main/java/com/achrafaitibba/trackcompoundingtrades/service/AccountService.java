@@ -67,7 +67,7 @@ public class AccountService {
             throw new RequestException(CustomErrorMessage.COMPOUNDING_LESS_THAN_MONTH.getMessage(), HttpStatus.CONFLICT);
 
         }
-        List<Target> targets = targetService.calculateTargets(request);
+
         CompoundingPeriod compoundingPeriod = compoundingPeriodRepository.save(CompoundingPeriod
                 .builder()
                 .number(request.compoundingPeriod().number())
@@ -82,19 +82,19 @@ public class AccountService {
                         .tradingCycle(request.tradingCycle())
                         .stopLossPercentage(request.stopLossPercentage())
                         .currentBalance(request.baseCapital())
-                        .estimatedCompoundedBalance(targets.get(targets.size()-1).getEstimatedBalanceByTargetAndTimeFrame())
+                        //.estimatedCompoundedBalance(targets.get(targets.size()-1).getEstimatedBalanceByTargetAndTimeFrame())
                         .officialStartDate(request.officialStartDate())
                         .compoundingPeriod(
                                 compoundingPeriod
                         )
-                        .targets(targets)
                         .build());
         User toSave = userRepository.save(User.builder()
                 .username(request.username())
                 .password(passwordEncoder.encode(request.password()))
                 .account(account)
                 .build());
-
+        List<Target> targets = targetService.calculateTargets(account.getAccountId(), request);
+        account.setEstimatedCompoundedBalance(targets.get(targets.size()-1).getEstimatedBalanceByTargetAndTimeFrame());
         Map<String, Object> claims  = new HashMap<>();
         claims.put("accountId", account.getAccountId());
         var jwtToken = jwtService.generateToken(claims, toSave);

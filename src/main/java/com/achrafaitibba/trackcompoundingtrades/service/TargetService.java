@@ -1,19 +1,26 @@
 package com.achrafaitibba.trackcompoundingtrades.service;
 
+import com.achrafaitibba.trackcompoundingtrades.configuration.token.JwtService;
 import com.achrafaitibba.trackcompoundingtrades.dto.request.AccountRegisterRequest;
 import com.achrafaitibba.trackcompoundingtrades.enumeration.TimeFrame;
+import com.achrafaitibba.trackcompoundingtrades.model.Account;
 import com.achrafaitibba.trackcompoundingtrades.model.Target;
 import com.achrafaitibba.trackcompoundingtrades.repository.TargetRepository;
+import com.achrafaitibba.trackcompoundingtrades.repository.UserRepository;
+import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.temporal.TemporalAdjusters;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.logging.Filter;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,6 +28,10 @@ import java.util.stream.Collectors;
 public class TargetService {
 
     private final TargetRepository targetRepository;
+    private final HttpServletRequest httpServletRequest;
+    private final JwtService jwtService;
+    private final UserRepository userRepository;
+
 
     /**
      * Compounding period = (number * timeframe)
@@ -46,7 +57,7 @@ public class TargetService {
      * stop loss percentage
      * current balance
      */
-    public List<Target> calculateDailyTargets(AccountRegisterRequest request) {
+    public List<Target> calculateDailyTargets(UUID accountId, AccountRegisterRequest request) {
         List<Target> targets = new ArrayList<>();
         int days = convertCompoundingPeriodToDays(request.compoundingPeriod().timeFrame(), request.compoundingPeriod().number());
         double baseCapital = request.baseCapital();
@@ -71,6 +82,8 @@ public class TargetService {
                                     .startDate(targetDate)
                                     .endDate(targetDate)
                                     .estimatedBalanceByTargetAndTimeFrame(currentBalance)
+                                    .account(Account.builder().accountId(accountId).build())
+
                                     .build()
                     );
                     targetDate = targetDate.plusDays(1);
@@ -83,6 +96,7 @@ public class TargetService {
                                     .startDate(targetDate)
                                     .endDate(targetDate)
                                     .estimatedBalanceByTargetAndTimeFrame(currentBalance)
+                                    .account(Account.builder().accountId(accountId).build())
 
                                     .build()
                     );
@@ -103,6 +117,8 @@ public class TargetService {
                                     .startDate(targetDate)
                                     .endDate(targetDate)
                                     .estimatedBalanceByTargetAndTimeFrame(currentBalance)
+                                    .account(Account.builder().accountId(accountId).build())
+
                                     .build()
                     );
                     targetDate = targetDate.plusDays(1);
@@ -115,6 +131,8 @@ public class TargetService {
                                     .startDate(targetDate)
                                     .endDate(targetDate)
                                     .estimatedBalanceByTargetAndTimeFrame(currentBalance)
+                                    .account(Account.builder().accountId(accountId).build())
+
                                     .build()
                     );
                     targetDate = targetDate.plusDays(1);
@@ -145,9 +163,9 @@ public class TargetService {
      * target end date = last day of the week OR start date + 6
      * timeframe = week
      */
-    public void calculateWeeklyTargets(AccountRegisterRequest request) {
+    public void calculateWeeklyTargets(UUID accountId, AccountRegisterRequest request) {
         List<Target> weeklyTargets = new ArrayList<>();
-        List<Target> dailyTargets = calculateDailyTargets(request);
+        List<Target> dailyTargets = calculateDailyTargets(accountId, request);
         int days = convertCompoundingPeriodToDays(request.compoundingPeriod().timeFrame(), request.compoundingPeriod().number());
         int weeks = days / 7;
         LocalDate startDate = request.officialStartDate();
@@ -163,6 +181,8 @@ public class TargetService {
                                     .startDate(startDate)
                                     .endDate(t.getEndDate())
                                     .estimatedBalanceByTargetAndTimeFrame(t.getEstimatedBalanceByTargetAndTimeFrame())
+                                    .account(Account.builder().accountId(accountId).build())
+
                                     .build()
                     );
                     startDate = startDate.plusDays(7);
@@ -179,6 +199,8 @@ public class TargetService {
                                 .startDate(endDate)
                                 .endDate(t.getEndDate())
                                 .estimatedBalanceByTargetAndTimeFrame(t.getEstimatedBalanceByTargetAndTimeFrame())
+                                .account(Account.builder().accountId(accountId).build())
+
                                 .build()
                 );
             }
@@ -187,9 +209,9 @@ public class TargetService {
         targetRepository.saveAll(weeklyTargets);
     }
 
-    public List<Target> calculateMonthlyTargets(AccountRegisterRequest request) {
-        List<Target> dailyTarget = calculateDailyTargets(request);
-        calculateWeeklyTargets(request);
+    public List<Target> calculateMonthlyTargets(UUID accountId, AccountRegisterRequest request) {
+        List<Target> dailyTarget = calculateDailyTargets(accountId, request);
+        calculateWeeklyTargets(accountId, request);
         List<Target> monthlyTarget = new ArrayList<>();
         List<LocalDate> dateList = dailyTarget.stream().map(
                 Target::getEndDate
@@ -208,6 +230,8 @@ public class TargetService {
                                     .startDate((t.getEndDate().with(TemporalAdjusters.firstDayOfMonth())))
                                     .endDate(lastRecord)
                                     .estimatedBalanceByTargetAndTimeFrame(t.getEstimatedBalanceByTargetAndTimeFrame())
+                                    .account(Account.builder().accountId(accountId).build())
+
                                     .build());
                         }
                     }
@@ -217,10 +241,10 @@ public class TargetService {
         return monthlyTarget;
     }
 
-    public List<Target> calculateYearlyTargets(AccountRegisterRequest request) {
-        calculateMonthlyTargets(request);
+    public List<Target> calculateYearlyTargets(UUID accountId, AccountRegisterRequest request) {
+        calculateMonthlyTargets(accountId, request);
         List<Target> yearlyTargets = new ArrayList<>();
-        List<Target> dailyTarget = calculateDailyTargets(request);
+        List<Target> dailyTarget = calculateDailyTargets(accountId, request);
         List<LocalDate> dateList = dailyTarget.stream().map(
                 Target::getEndDate
         ).toList();
@@ -238,6 +262,7 @@ public class TargetService {
                                     .startDate((t.getEndDate().with(TemporalAdjusters.firstDayOfMonth())))
                                     .endDate(lastRecord)
                                     .estimatedBalanceByTargetAndTimeFrame(t.getEstimatedBalanceByTargetAndTimeFrame())
+                                    .account(Account.builder().accountId(accountId).build())
                                     .build());
                         }
                     }
@@ -249,7 +274,19 @@ public class TargetService {
     }
 
 
-    public List<Target> calculateTargets(AccountRegisterRequest request) {
-        return calculateYearlyTargets(request);
+    public List<Target> calculateTargets(UUID accountId, AccountRegisterRequest request) {
+        return calculateYearlyTargets(accountId, request);
+    }
+
+    public Page<Target> getAll(String timeframe, Integer page, Integer size) {
+        String header = httpServletRequest.getHeader("Authorization");
+        String jwt = header.substring(7);
+        Claims claims = jwtService.extractAllClaims(jwt);
+        Account account = userRepository.findByUsername(
+                claims.getSubject()
+        ).get().getAccount();
+        Sort sorting = Sort.by("startDate");
+        Pageable pageable = PageRequest.of(page, size, sorting);
+        return targetRepository.findByTimeFrameAndAccount_AccountId(TimeFrame.valueOf(timeframe), account.getAccountId(), pageable);
     }
 }

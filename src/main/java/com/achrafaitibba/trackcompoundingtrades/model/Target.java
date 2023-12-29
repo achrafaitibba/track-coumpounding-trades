@@ -1,9 +1,8 @@
 package com.achrafaitibba.trackcompoundingtrades.model;
 
 import com.achrafaitibba.trackcompoundingtrades.enumeration.TimeFrame;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,6 +26,8 @@ public class Target {
     private LocalDate startDate;
     private LocalDate endDate;
     private Double estimatedBalanceByTargetAndTimeFrame;
-
+    @ManyToOne
+    @JsonIgnore
+    private Account account;
 
 }

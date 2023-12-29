@@ -33,6 +33,5 @@ public class Account {
     private LocalDate officialStartDate; // format : "yyyy-mm-dd"
     @OneToOne
     private CompoundingPeriod compoundingPeriod;
-    @OneToMany
-    private List<Target> targets;
+
 }
