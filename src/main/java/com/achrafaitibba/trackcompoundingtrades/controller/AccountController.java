@@ -44,13 +44,5 @@ public class AccountController {
     public ResponseEntity<AccountStats> refreshAccountStats() {
         return ResponseEntity.ok().body(accountService.refresfAccountStats());
     }
-    //todo
-    /**
-     *  Also show user target, extract them from targets by date:
-     *  >Today
-     *  >Week
-     *  >Month
-     *
-     */
 
 }
