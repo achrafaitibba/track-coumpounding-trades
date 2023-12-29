@@ -1,6 +1,7 @@
 package com.achrafaitibba.trackcompoundingtrades.controller;
 
 import com.achrafaitibba.trackcompoundingtrades.enumeration.TimeFrame;
+import com.achrafaitibba.trackcompoundingtrades.enumeration.TradeSortingOption;
 import com.achrafaitibba.trackcompoundingtrades.model.Coin;
 import com.achrafaitibba.trackcompoundingtrades.repository.CoinRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,11 @@ public class EnumController {
     @GetMapping("/timeframes")
     public ResponseEntity<List<TimeFrame>> getAllTimeFrames(){
         return ResponseEntity.ok().body(Arrays.asList(TimeFrame.values()));
+    }
+
+    @GetMapping("/TradeSortingOptions")
+    public ResponseEntity<List<TradeSortingOption>> getAllSortingOptions(){
+        return ResponseEntity.ok().body(Arrays.asList(TradeSortingOption.values()));
     }
 
 

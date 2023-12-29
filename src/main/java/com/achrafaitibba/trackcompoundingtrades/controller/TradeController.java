@@ -46,6 +46,5 @@ public class TradeController {
 
     }
 
-    //todo> endpoint of the sorting options > date, investedCap, closedAt, PNL, targetByInvestedCap, diffProfitTarget, tradingPair
 
 }
