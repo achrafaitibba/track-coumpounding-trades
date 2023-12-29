@@ -4,6 +4,7 @@ import com.achrafaitibba.trackcompoundingtrades.configuration.token.JwtService;
 import com.achrafaitibba.trackcompoundingtrades.configuration.token.Token;
 import com.achrafaitibba.trackcompoundingtrades.configuration.token.TokenRepository;
 import com.achrafaitibba.trackcompoundingtrades.configuration.token.TokenType;
+import com.achrafaitibba.trackcompoundingtrades.dto.AccountStats;
 import com.achrafaitibba.trackcompoundingtrades.dto.request.AccountAuthenticateRequest;
 import com.achrafaitibba.trackcompoundingtrades.dto.request.AccountRegisterRequest;
 import com.achrafaitibba.trackcompoundingtrades.dto.request.AccountResetRequest;
@@ -190,6 +191,23 @@ public class AccountService {
                 account.getStopLossPercentage(),
                 account.getOfficialStartDate(),
                 account.getCompoundingPeriod()
+
+        );
+    }
+
+    public AccountStats refresfAccountStats() {
+        String header = httpServletRequest.getHeader("Authorization");
+        String jwt = header.substring(7);
+        Claims claims = jwtService.extractAllClaims(jwt);
+        Account account = userRepository.findByUsername(
+                claims.getSubject()
+        ).get().getAccount();
+        return new AccountStats(
+                account.getCurrentBalance(),
+                account.getCurrentBalance() - account.getBaseCapital(),
+                account.getEstimatedCompoundedBalance(),
+                account.getEstimatedCompoundedBalance() - account.getBaseCapital(),
+                tradeRepository.countAllByAccount_AccountId(account.getAccountId())
 
         );
     }
