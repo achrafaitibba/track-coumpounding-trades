@@ -29,4 +29,22 @@ public class AccountController {
     }
 
 
+    //todo
+    /**
+     * show user each time connected:
+     *  >balance (baseCapital + sum(PNL)"
+     *  >PNL (sum(PNL))
+     *  >EST ATP (final target -baseCapital)
+     *  > dif aka status ( current balance - estimated final target)
+     *  > total trades = count(trades)
+     *
+     *
+     *
+     *  Also show user target, extract them from targets by date:
+     *  >Today
+     *  >Week
+     *  >Month
+     *
+     */
+
 }

@@ -34,8 +34,10 @@ public class TradeController {
 
 
 
+
     //todo
     /**
      * get all trades by user
+     * filter by / date, PNL, pair, diff "means if target is done"
      */
 }

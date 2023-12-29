@@ -24,8 +24,8 @@ public class Trade {
     private LocalDate date;
     private Double investedCap;
     private Double closedAt;
-    private Double PNL; // closedAt - investedCap
-    private Double targetByInvestedCap; //always profit calculation
+    private Double PNL; // (closedAt - investedCap)
+    private Double targetByInvestedCap; // calculated for each trade
     private Double diffProfitTarget; // difference between target and profit > calc(target - closedAt)
     private String tradingPair;
     @ManyToOne

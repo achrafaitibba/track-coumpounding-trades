@@ -20,7 +20,6 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
-import java.util.logging.Filter;
 import java.util.stream.Collectors;
 
 @Service
@@ -68,7 +67,6 @@ public class TargetService {
         double currentBalance = baseCapital; // todo; (baseCapital + sum(profit by trades)
         final int cycleLimit = request.tradingCycle();
         LocalDate targetDate = request.officialStartDate();
-        ////////////////////////////////////::
         int cycleLimitCount = cycleLimit; //days
         int profitableTradesCount = 0;
         int losingTradesCount = 0;
