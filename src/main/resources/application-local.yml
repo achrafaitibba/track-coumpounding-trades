@@ -13,7 +13,6 @@ spring:
         format_sql: true
     database: mysql
     database-platform: org.hibernate.dialect.MySQLDialect
-
 logging:
   level:
     org:
@@ -28,3 +27,5 @@ app:
       refresh-token:
         expiration: 604800000 # 7 days
 
+server:
+  port: 8081

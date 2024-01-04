@@ -7,6 +7,7 @@ import com.achrafaitibba.trackcompoundingtrades.exception.RequestException;
 import com.achrafaitibba.trackcompoundingtrades.model.Account;
 import com.achrafaitibba.trackcompoundingtrades.model.Coin;
 import com.achrafaitibba.trackcompoundingtrades.model.Trade;
+import com.achrafaitibba.trackcompoundingtrades.repository.AccountRepository;
 import com.achrafaitibba.trackcompoundingtrades.repository.CoinRepository;
 import com.achrafaitibba.trackcompoundingtrades.repository.TradeRepository;
 import com.achrafaitibba.trackcompoundingtrades.repository.UserRepository;
@@ -33,6 +34,7 @@ public class TradeService {
     private final UserRepository userRepository;
     private final TradeRepository tradeRepository;
     private final CoinRepository coinRepository;
+    private final AccountRepository accountRepository;
 
     public Trade createTrade(TradeRequest request) {
         String header = httpServletRequest.getHeader("Authorization");
@@ -114,7 +116,7 @@ public class TradeService {
         if (request.closedAt() <= 0) {
             throw new RequestException(CustomErrorMessage.CLOSED_AT_ZERO_VALUE.getMessage(), HttpStatus.CONFLICT);
         }
-        account.setCurrentBalance(account.getCurrentBalance() - trade.get().getPNL());
+
         Double targetByInvestedCapital = targetService.calculateTarget(
                 "win",
                 request.investedCap(),
@@ -122,15 +124,17 @@ public class TradeService {
                 account.getEstimatedFeesByTradePercentage() / 100
         );
         double oldPNL = trade.get().getPNL();
+        double previousBalance = account.getCurrentBalance() - oldPNL;
         trade.get().setDate(request.tradeDate());
         trade.get().setInvestedCap(request.investedCap());
         trade.get().setClosedAt(request.closedAt());
         trade.get().setPNL(request.closedAt() - request.investedCap());
         trade.get().setTargetByInvestedCap(targetByInvestedCapital);
         trade.get().setDiffProfitTarget(request.closedAt() - targetByInvestedCapital);
-        trade.get().setTradingPair(request.baseCoin().toUpperCase()+"-"+request.quoteCoin().toUpperCase());
-        Trade  saved = tradeRepository.save(trade.get());
-        account.setCurrentBalance(account.getCurrentBalance() - oldPNL + saved.getPNL());
+        trade.get().setTradingPair(request.baseCoin().toUpperCase() + "-" + request.quoteCoin().toUpperCase());
+        Trade saved = tradeRepository.save(trade.get());
+        account.setCurrentBalance(previousBalance + saved.getPNL());
+        accountRepository.save(account);
         return saved;
     }
 
@@ -141,7 +145,7 @@ public class TradeService {
         Account account = userRepository.findByUsername(
                 claims.getSubject()
         ).get().getAccount();
-        Sort sorting = Sort.by(Sort.Direction.valueOf(direction),sort);
+        Sort sorting = Sort.by(Sort.Direction.valueOf(direction), sort);
         Pageable pageable = PageRequest.of(page, size, sorting);
         return tradeRepository.findByAccount_AccountId(account.getAccountId(), pageable);
 
