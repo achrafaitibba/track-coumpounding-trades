@@ -39,7 +39,8 @@ public class SecurityConfigurationFilter {
                         "/api/v1/account/refresh-token",
                         "/api/v1/enums/timeframes",
                         "api/v1/enums/TradeSortingOptions",
-                        "/api/v1/account/update-password"
+                        "/api/v1/account/update-password",
+                        "/api/v1/enums/security-question"
                 )
                 .permitAll()
                 //////////////////////

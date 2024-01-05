@@ -35,4 +35,10 @@ public class EnumController {
     public ResponseEntity<List<Coin>> getAllCoins(){
         return ResponseEntity.ok().body(coinRepository.findAll());
     }
+
+    @GetMapping("/security-question")
+    public ResponseEntity<String> getSecurityQuestion(){
+        return ResponseEntity.ok().body("What is your favorite player and your mom's birth date?\n" +
+                "In this format: 'favoritePlayer-YYYY-DD-MM'");
+    }
 }
