@@ -13,6 +13,7 @@ public record AccountRegisterRequest(
         Integer tradingCycle,
         Double stopLossPercentage,
         LocalDate officialStartDate,
-        CompoundingPeriodRequest compoundingPeriod
+        CompoundingPeriodRequest compoundingPeriod,
+        String securityAnswer
 ) {
 }

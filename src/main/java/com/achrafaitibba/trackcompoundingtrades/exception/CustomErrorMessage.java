@@ -14,7 +14,9 @@ public enum CustomErrorMessage {
     TRADE_DATE_SHOULD_BE_AFTER_START_DATE("Trade date should be after the official start date"),
     NEGATIVE_INVESTED_CAP("The invested cap should be higher than Zero"),
     INVESTED_CAP_HIGHER_THAN_BASE_CAP("The invested capital can't be higher than current balance"),
-    CLOSED_AT_ZERO_VALUE("The closed at value should be higher than ZERO")
+    CLOSED_AT_ZERO_VALUE("The closed at value should be higher than ZERO"),
+    SECURITY_ANSWER_NULL("The security answer can't be empty"),
+    SECURITY_ANSWER_INCORRECT("The answer is incorrect")
     ;
     private final String msg;
     CustomErrorMessage(String msg){

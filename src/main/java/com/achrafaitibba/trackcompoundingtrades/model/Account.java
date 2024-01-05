@@ -34,4 +34,6 @@ public class Account {
     @OneToOne
     private CompoundingPeriod compoundingPeriod;
 
+    private String securityAnswer;
+
 }

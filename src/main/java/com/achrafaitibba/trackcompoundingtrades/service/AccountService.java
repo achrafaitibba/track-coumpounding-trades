@@ -8,6 +8,7 @@ import com.achrafaitibba.trackcompoundingtrades.dto.AccountStats;
 import com.achrafaitibba.trackcompoundingtrades.dto.request.AccountAuthenticateRequest;
 import com.achrafaitibba.trackcompoundingtrades.dto.request.AccountRegisterRequest;
 import com.achrafaitibba.trackcompoundingtrades.dto.request.AccountResetRequest;
+import com.achrafaitibba.trackcompoundingtrades.dto.request.AccountUpdatePassword;
 import com.achrafaitibba.trackcompoundingtrades.dto.response.AccountAuthenticateResponse;
 import com.achrafaitibba.trackcompoundingtrades.dto.response.AccountPreferencesResponse;
 import com.achrafaitibba.trackcompoundingtrades.exception.CustomErrorMessage;
@@ -78,7 +79,9 @@ public class AccountService {
             throw new RequestException(CustomErrorMessage.COMPOUNDING_LESS_THAN_MONTH.getMessage(), HttpStatus.CONFLICT);
 
         }
-
+        if(request.securityAnswer().isEmpty()){
+            throw new RequestException(CustomErrorMessage.SECURITY_ANSWER_NULL.getMessage(), HttpStatus.BAD_REQUEST);
+        }
         CompoundingPeriod compoundingPeriod = compoundingPeriodRepository.save(CompoundingPeriod
                 .builder()
                 .number(request.compoundingPeriod().number())
@@ -97,6 +100,7 @@ public class AccountService {
                         .compoundingPeriod(
                                 compoundingPeriod
                         )
+                        .securityAnswer(request.securityAnswer())
                         .build());
         User toSave = userRepository.save(User.builder()
                 .username(request.username())
@@ -170,7 +174,8 @@ public class AccountService {
                 request.tradingCycle(),
                 request.stopLossPercentage(),
                 request.officialStartDate(),
-                request.compoundingPeriod()
+                request.compoundingPeriod(),
+                account.getSecurityAnswer()
         ));
     }
 
@@ -209,5 +214,21 @@ public class AccountService {
                 tradeRepository.countAllByAccount_AccountId(account.getAccountId())
 
         );
+    }
+
+    public AccountAuthenticateResponse updatePassword(AccountUpdatePassword request) {
+        Optional<User> userToRecover = userRepository.findByUsername(request.username());
+        if(userToRecover.isEmpty()){
+            throw new RequestException(CustomErrorMessage.ACCOUNT_NOT_EXISTING.getMessage(), HttpStatus.CONFLICT);
+
+        }
+        Optional<Account> account = Optional.ofNullable(userToRecover.get().getAccount());
+        if(!account.get().getSecurityAnswer().equals(request.securityAnswer())){
+            throw new RequestException(CustomErrorMessage.SECURITY_ANSWER_INCORRECT.getMessage(), HttpStatus.CONFLICT);
+        }
+
+        userToRecover.get().setPassword(passwordEncoder.encode(request.newPassword()));
+        userRepository.save(userToRecover.get());
+        return authenticate(new AccountAuthenticateRequest(request.username(), request.newPassword()));
     }
 }

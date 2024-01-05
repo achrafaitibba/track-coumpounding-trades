@@ -4,6 +4,7 @@ import com.achrafaitibba.trackcompoundingtrades.dto.AccountStats;
 import com.achrafaitibba.trackcompoundingtrades.dto.request.AccountAuthenticateRequest;
 import com.achrafaitibba.trackcompoundingtrades.dto.request.AccountRegisterRequest;
 import com.achrafaitibba.trackcompoundingtrades.dto.request.AccountResetRequest;
+import com.achrafaitibba.trackcompoundingtrades.dto.request.AccountUpdatePassword;
 import com.achrafaitibba.trackcompoundingtrades.dto.response.AccountAuthenticateResponse;
 import com.achrafaitibba.trackcompoundingtrades.dto.response.AccountPreferencesResponse;
 import com.achrafaitibba.trackcompoundingtrades.service.AccountService;
@@ -28,6 +29,11 @@ public class AccountController {
     public ResponseEntity<AccountAuthenticateResponse> authenticate(@RequestBody AccountAuthenticateRequest request) {
 
         return ResponseEntity.ok().body(accountService.authenticate(request));
+    }
+
+    @PostMapping("/update-password")
+    public ResponseEntity<AccountAuthenticateResponse> updatePassword(@RequestBody AccountUpdatePassword request){
+        return ResponseEntity.ok().body(accountService.updatePassword(request));
     }
 
     @PostMapping("/reset")
